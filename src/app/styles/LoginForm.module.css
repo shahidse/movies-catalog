@@ -1,0 +1,41 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh; /* Center vertically */
+  background-color: #f0f0f0; /* Light background color */
+}
+
+.form {
+  background: white;
+  padding: 2rem; /* Padding around the form */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Shadow effect */
+  width: 300px; /* Fixed width for the form */
+}
+
+.input {
+  width: 100%; /* Full width */
+  padding: 0.5rem; /* Padding inside the input */
+  margin: 0.5rem 0; /* Margin between inputs */
+  border: 1px solid #ccc; /* Border color */
+  border-radius: 4px; /* Rounded corners for inputs */
+  color: black; /* Text color */
+  font-size: 1rem; /* Font size */
+}
+
+.button {
+  width: 100%; /* Full width */
+  padding: 0.5rem; /* Padding inside the button */
+  background-color: #0070f3; /* Button color */
+  color: white; /* Button text color */
+  border: none; /* Remove border */
+  border-radius: 4px; /* Rounded corners for button */
+  cursor: pointer; /* Pointer on hover */
+  font-size: 1rem; /* Font size */
+}
+
+.button:hover {
+  background-color: #005bb5; /* Darker shade on hover */
+}
