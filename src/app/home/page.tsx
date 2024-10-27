@@ -29,6 +29,16 @@ const HomePage: React.FC = () => {
                     Authorization: `Bearer ${user.token}`,
                 },
             });
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    router.push('/login'); // Redirect to login on 401 error
+                } else {
+                    console.error('Failed to fetch recommended movies');
+                }
+                return;
+            }
+
             const data = await response.json();
             setRecommendedMovies(data);
         };
@@ -39,6 +49,16 @@ const HomePage: React.FC = () => {
                     Authorization: `Bearer ${user.token}`,
                 },
             });
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    router.push('/login'); // Redirect to login on 401 error
+                } else {
+                    console.error('Failed to fetch categories');
+                }
+                return;
+            }
+
             const data = await response.json();
             setCategories(data);
         };
@@ -54,6 +74,16 @@ const HomePage: React.FC = () => {
                 Authorization: `Bearer ${user?.token}`,
             },
         });
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                router.push('/login'); // Redirect to login on 401 error
+            } else {
+                console.error('Failed to search movies');
+            }
+            return;
+        }
+
         const data = await response.json();
         setSearchResults(data);
         setShowSearchResults(true);
@@ -65,9 +95,19 @@ const HomePage: React.FC = () => {
                 Authorization: `Bearer ${user?.token}`,
             },
         });
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                router.push('/login'); // Redirect to login on 401 error
+            } else {
+                console.error('Failed to fetch category movies');
+            }
+            return;
+        }
+
         const data = await response.json();
         setRecommendedMovies(data);
-        setCategoryName(name)
+        setCategoryName(name);
     };
 
     const toggleMenu = () => setShowMenu(!showMenu); // Toggle user menu
@@ -77,12 +117,34 @@ const HomePage: React.FC = () => {
         router.push('/login'); // Redirect to login after logout
     };
 
+    const handleRateMovie = async (movieId: string, rating: number) => {
+        const response = await fetch(`${process.env.movieBaseUrl}users/${user?.id}/rate`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${user?.token}`,
+            },
+            body: JSON.stringify({ movieId, rating }),
+        });
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                router.push('/login'); // Redirect to login on 401 error
+            } else {
+                alert('Failed to submit rating.');
+            }
+            return;
+        }
+
+        alert('Rating submitted successfully!');
+    };
+
     return (
         <div className="p-4">
             <nav className="flex items-center justify-between p-4 bg-gray-800 text-white">
                 <div className="flex items-center">
-                    <h1 className="text-xl font-bold">App Logo</h1>
-                    <ul className="flex space-x-4 ml-6">
+                    <h1 className="text-xl font-bold font-special">App Logo</h1>
+                    <ul className="flex space-x-4 ml-6 ">
                         {categories.map((category) => (
                             <li key={category.id}>
                                 <button
@@ -119,7 +181,7 @@ const HomePage: React.FC = () => {
                         {showMenu && (
                             <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded">
                                 <button
-                                    onClick={() => router.push('/edit-profile')}
+                                    onClick={() => router.push(`/profile`)}
                                     className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
                                 >
                                     Edit Profile
@@ -137,7 +199,7 @@ const HomePage: React.FC = () => {
             </nav>
 
             <h1 className="text-2xl font-bold mb-4">Welcome, {user?.email}!</h1>
-            <h2 className="text-xl mb-2">{categoryName}:</h2>
+            <h2 className="text-xl mb-2 text-white bg-black">{categoryName}:</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 m-2">
                 {recommendedMovies.map((movie) => (
                     <div key={movie.id} className="border rounded p-2">
@@ -150,13 +212,28 @@ const HomePage: React.FC = () => {
                         />
                         <h3 className="font-semibold">{movie.title}</h3>
                         <p>{movie.description}</p>
+                        <div className="mt-2">
+                            <label htmlFor={`rating-${movie.id}`} className="block mb-1">Rate this movie: ({movie.rating})</label>
+                            <select
+                                id={`rating-${movie.id}`}
+                                onChange={(e) => handleRateMovie(movie.id, Number(e.target.value))}
+                                className="border border-gray-300 rounded p-1"
+                            >
+                                <option value="" disabled>Select rating</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                        </div>
                     </div>
                 ))}
             </div>
 
             {showSearchResults && (
                 <div className="mt-4">
-                    <h2 className="text-xl mb-2">Search Results:</h2>
+                    <h2 className="text-xl mb-2 text-white bg-black">Search Results:</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 m2">
                         {searchResults.map((result) => (
                             <div key={result.id} className="border rounded p-2">
@@ -169,6 +246,22 @@ const HomePage: React.FC = () => {
                                 />
                                 <h3 className="font-semibold">{result.title}</h3>
                                 <p>{result.description}</p>
+                                <div className="mt-2">
+                                    <label htmlFor={`rating-${result.id}`} className="block mb-1">Rate this movie:  ({result?.rating})</label>
+                                    <select
+                                        id={`rating-${result.id}`}
+                                        onChange={(e) => handleRateMovie(result.id, Number(e.target.value))}
+                                        className="border border-gray-300 rounded p-1"
+                                        defaultValue={1}
+                                    >
+                                        <option value="" disabled>Select rating</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                    </select>
+                                </div>
                             </div>
                         ))}
                     </div>

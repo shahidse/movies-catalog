@@ -11,7 +11,7 @@ const LoginPage: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
-    const [loading, setLoading] = useState(false); 
+    const [loading, setLoading] = useState(false);
     const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -36,7 +36,7 @@ const LoginPage: React.FC = () => {
             const accessToken = data.access_token; // Assuming the token is returned in this format
 
             // Call the login method from Auth context
-            login({ email, token: accessToken });
+            login({ email, token: accessToken, id: data.id, name: data.name, dob: data.dob, address: data.address, categories: data.categories });
             // Store the access token in localStorage or state
             localStorage.setItem('accessToken', accessToken);
 
